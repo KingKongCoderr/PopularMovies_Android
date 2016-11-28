@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string-array name="prefs_sortingOrder_options">
+    <item>@string/pref_nowPlaying_label</item>
+    <item>@string/pref_mostPopular_label</item>
+    <item>@string/pref_topRated_label</item>
+
+</string-array>
+<string-array name="prefs_sortingOrder_values">
+    <item>@string/pref_nowPlaying</item>
+    <item>@string/pref_mostPopular</item>
+    <item>@string/pref_topRated</item>
+</string-array>
+</resources>
