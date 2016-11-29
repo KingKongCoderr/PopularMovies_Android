@@ -15,6 +15,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,25 +37,47 @@ public class Grids_Fragment extends Fragment {
     GridView mgridView;
     ArrayAdapter<Movie> mAdapter;
     List<Movie> list;
+public Grids_Fragment(){
+
+}
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        loadImages();
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
     }
 
-    @Nullable
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view= super.onCreateView(inflater, container, savedInstanceState);
+        View view=inflater.inflate(R.layout.fragment_grids,container,false);
 
+
+
+        mgridView=(GridView) view.findViewById(R.id.grid_view);
         list=new ArrayList<Movie>();
-        mgridView=(GridView)view.findViewById(R.id.grid_view);
-        mAdapter= new ArrayAdapter<Movie>(getContext(),R.layout.grid_item,R.id.grid_item_imgview,list) {
+
+        mAdapter= new ArrayAdapter<Movie>(getContext(),R.layout.grid_item,R.id.text_view,list) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View v= super.getView(position, convertView, parent);
 
-                ImageView imgView=(ImageView)v.findViewById(R.id.grid_item_imgview);
+                TextView txtView=(TextView)v.findViewById(R.id.text_view);
+                ImageView imgView=(ImageView) v.findViewById(R.id.grid_item_imgview);
+
+
+                String base_img_url="http://image.tmdb.org/t/p/";
+                String img_size="w342";
+                String img_path=list.get(position).getImg_url();
+                txtView.setText(list.get(position).getMov_title());
+                Picasso.with(this.getContext()).load(base_img_url+img_size+img_path).into(imgView);
 
 
 
@@ -61,7 +86,7 @@ public class Grids_Fragment extends Fragment {
             }
         };
 
-
+mgridView.setAdapter(mAdapter);
 
         return view;
     }
@@ -82,14 +107,18 @@ public class Grids_Fragment extends Fragment {
 
         @Override
         protected Movie[] doInBackground(String... params) {
+
+            if(params.length==0){
+                return null;
+            }
            //ArrayList<Movie> movies_list=new ArrayList<>();
             BufferedReader reader=null;
             HttpURLConnection urlConnection=null;
 
             String movieJsonstr="";
 
-            final String api_key="031db1b9b1671f6a20497703858dc72f";
-            final String baseUrl="http://api.themoviedb.org/3/";
+            String api_key="031db1b9b1671f6a20497703858dc72f";
+            String baseUrl="http://api.themoviedb.org/3/";
 
 
             try{
@@ -97,6 +126,7 @@ public class Grids_Fragment extends Fragment {
               //  URI builturi= Uri.parse(base_url).buildUpon().appendQueryParameter()
                 URL url=new URL(baseUrl+params[0]+"api_key="+api_key);
                 urlConnection=(HttpURLConnection)url.openConnection();
+                //Log.d("params",url.toString());
                 urlConnection.setRequestMethod("GET");
                 urlConnection.connect();
 
@@ -133,17 +163,24 @@ public class Grids_Fragment extends Fragment {
 
 
 
-            try {
+           try {
+                Log.d("hello",movieJsonstr);
                 return getMoviesFromJson(movieJsonstr);
             }catch (JSONException e){
                 Log.e(Log_tag,e.getMessage(),e);
-            }
+           }
             return null;
         }
 
         @Override
         protected void onPostExecute(Movie[] movies) {
 
+            if(movies!=null){
+                mAdapter.clear();
+                for(Movie obj:movies){
+                    mAdapter.add(obj);
+                }
+            }
 
 
         }
@@ -163,11 +200,13 @@ public class Grids_Fragment extends Fragment {
                 String title;
                 double rating;
 
-                img_url= movie_obj.getJSONObject("poster_path").toString();
-                plot_synopsis=movie_obj.getJSONObject("overview").toString();
-                release_date=movie_obj.getJSONObject("release_date").toString();
-                title=movie_obj.getJSONObject("title").toString();
-                rating=Double.parseDouble(movie_obj.getJSONObject("vote_average").toString());
+
+                img_url= (movie_obj.getString("poster_path"));
+                plot_synopsis=movie_obj.getString("overview");
+                release_date=movie_obj.getString("release_date");
+                title=movie_obj.getString("title");
+                rating=Double.parseDouble(movie_obj.getString("vote_average"));
+                movies.add(new Movie(title,img_url,plot_synopsis,rating,release_date));
 
 
 
