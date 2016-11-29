@@ -9,13 +9,23 @@ public class Movie {
     private String plot_synopsis;
     private double rating;//vote_average
     private String release_date;
+            private String backdrop_url;
 
-    public Movie(String mov_title, String img_url, String plot_synopsis, double rating, String release_date) {
+    public Movie(String mov_title, String img_url, String plot_synopsis, double rating, String release_date, String backdrop_url) {
         this.mov_title = mov_title;
         this.img_url = img_url;
         this.plot_synopsis = plot_synopsis;
         this.rating = rating;
         this.release_date = release_date;
+        this.backdrop_url=backdrop_url;
+    }
+
+    public String getBackdrop_url() {
+        return backdrop_url;
+    }
+
+    public void setBackdrop_url(String backdrop_url) {
+        this.backdrop_url = backdrop_url;
     }
 
     public String getMov_title() {

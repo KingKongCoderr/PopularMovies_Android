@@ -10,7 +10,7 @@
     <string name="pref_topRated_label">Top Rated</string>
     <string name="pref_mostPopular_label">Most Popular</string>
     <string name="pref_mostPopular">movie/popular/?</string>
-    <string name="pref_topRated">movie/topRated/?</string>
+    <string name="pref_topRated">movie/top_rated/?</string>
     <string name="pref_nowPlaying">discover/movie/?</string>
 
 </resources>

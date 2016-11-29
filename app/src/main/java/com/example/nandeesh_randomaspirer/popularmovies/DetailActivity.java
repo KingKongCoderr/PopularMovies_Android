@@ -30,6 +30,8 @@ ImageView mPoster;
         String img_size="w500";
         if(Detail_intent!=null&& Detail_intent.hasExtra("title")) {
             String img_path = Detail_intent.getStringExtra("imgurl");
+           // String img_path = Detail_intent.getStringExtra("backdrop");
+
 
             Picasso.with(this).load(base_img_url + img_size + img_path).into(mPoster);
             mtitle.setText("Movie: "+Detail_intent.getStringExtra("title"));

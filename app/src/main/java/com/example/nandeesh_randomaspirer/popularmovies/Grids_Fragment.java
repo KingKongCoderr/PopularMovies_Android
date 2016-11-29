@@ -3,6 +3,7 @@ package com.example.nandeesh_randomaspirer.popularmovies;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -11,6 +12,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -18,6 +22,7 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -44,15 +49,46 @@ public Grids_Fragment(){
 }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.main_menu,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id=item.getItemId();
+        if(id== R.id.settings){
+            Intent Settings_intent=new Intent(getActivity(), SettingsActivity.class);
+            startActivity(Settings_intent);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
+if(isOnline())
         loadImages();
+        else{
+    Toast.makeText(getContext(),"No Network",Toast.LENGTH_LONG).show();
+        }
+
     }
+
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getContext().getSystemService(getContext().CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null &&
+                cm.getActiveNetworkInfo().isConnectedOrConnecting();
+    }
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(true);
 
     }
 
@@ -77,7 +113,7 @@ public Grids_Fragment(){
 
                 String base_img_url="http://image.tmdb.org/t/p/";
                 String img_size="w342";
-                String img_path=list.get(position).getImg_url();
+                String img_path=list.get(position).getBackdrop_url();
                 txtView.setText(list.get(position).getMov_title());
                 Picasso.with(this.getContext()).load(base_img_url+img_size+img_path).into(imgView);
 
@@ -99,6 +135,7 @@ mgridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
         double detail_rating=obj_detail.getRating();
         String detail_releasedate=obj_detail.getRelease_date();
         String detail_img_url=obj_detail.getImg_url();
+        String detail_backdrop_url=obj_detail.getBackdrop_url();
 
         Intent detail_intent=new Intent(getActivity(),DetailActivity.class);
         detail_intent.putExtra("title",detail_title);
@@ -106,6 +143,7 @@ mgridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
         detail_intent.putExtra("rating",detail_rating);
         detail_intent.putExtra("releasedate",detail_releasedate);
         detail_intent.putExtra("imgurl",detail_img_url);
+        detail_intent.putExtra("backdrop",detail_backdrop_url);
         startActivity(detail_intent);
 
     }
@@ -119,6 +157,7 @@ mgridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
         FetchImagesTask backgroundtask=new FetchImagesTask();
         SharedPreferences pref= PreferenceManager.getDefaultSharedPreferences(getActivity());
         String order_url=pref.getString(getString(R.string.pref_sortingOrder_key),getString(R.string.pref_nowPlaying));
+        Log.d("order",order_url);
         backgroundtask.execute(order_url);
 
     }
@@ -139,7 +178,7 @@ mgridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             String movieJsonstr="";
 
-            String api_key="031db1b9b1671f6a20497703858dc72f";
+            String api_key="Your api key from theMoviedb.org";
             String baseUrl="http://api.themoviedb.org/3/";
 
 
@@ -148,7 +187,7 @@ mgridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
               //  URI builturi= Uri.parse(base_url).buildUpon().appendQueryParameter()
                 URL url=new URL(baseUrl+params[0]+"api_key="+api_key);
                 urlConnection=(HttpURLConnection)url.openConnection();
-                //Log.d("params",url.toString());
+                Log.d("params",url.toString());
                 urlConnection.setRequestMethod("GET");
                 urlConnection.connect();
 
@@ -217,6 +256,7 @@ mgridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 JSONObject movie_obj= resultsArray.getJSONObject(i);
 
                 String img_url;
+                String backdrop_url;
                 String plot_synopsis;
                 String release_date;
                 String title;
@@ -228,7 +268,8 @@ mgridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 release_date=movie_obj.getString("release_date");
                 title=movie_obj.getString("title");
                 rating=Double.parseDouble(movie_obj.getString("vote_average"));
-                movies.add(new Movie(title,img_url,plot_synopsis,rating,release_date));
+                backdrop_url=movie_obj.getString("backdrop_path");
+                movies.add(new Movie(title,img_url,plot_synopsis,rating,release_date,backdrop_url));
 
 
 
