@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.widget.RemoteViews;
 
+import com.example.nandeesh_randomaspirer.popularmovies.DetailActivity;
 import com.example.nandeesh_randomaspirer.popularmovies.R;
 
 /**
@@ -33,8 +34,10 @@ public class WidgetProvider extends AppWidgetProvider {
         remoteViews.setRemoteAdapter(R.id.movies_sv, serviceIntent);
         
         //setup intent template for handling click events.
-        
-        
+        Intent templateIntent = new Intent(context, DetailActivity.class);
+        PendingIntent pendingTemplateIntent = PendingIntent
+                .getActivity(context, 0 , templateIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setPendingIntentTemplate(R.id.movies_sv,pendingTemplateIntent);
         return remoteViews;
     }
     

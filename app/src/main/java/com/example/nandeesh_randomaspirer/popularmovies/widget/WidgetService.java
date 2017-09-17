@@ -8,6 +8,8 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
+
+import com.example.nandeesh_randomaspirer.popularmovies.DetailActivity;
 import com.example.nandeesh_randomaspirer.popularmovies.Movie;
 import com.example.nandeesh_randomaspirer.popularmovies.R;
 import com.squareup.picasso.Picasso;
@@ -73,7 +75,16 @@ public class WidgetService extends RemoteViewsService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-    
+            //click intent
+            Intent clickIntent = new Intent(context, DetailActivity.class);
+            Bundle args = new Bundle();
+            args.putString(DetailActivity.IMAGE_URL_EXTRA, dummy_array[i].getImg_url());
+            args.putString(DetailActivity.TITLE_EXTRA, dummy_array[i].getMov_title());
+            args.putString(DetailActivity.SYNOPSIS_EXTRA, dummy_array[i].getPlot_synopsis());
+            args.putDouble(DetailActivity.RATING_EXTRA, dummy_array[i].getRating());
+            args.putString(DetailActivity.RELEASE_DATE_EXTRA, dummy_array[i].getRelease_date());
+            clickIntent.putExtra("movie_clicked",args);
+            remoteViews.setOnClickFillInIntent(R.id.item_iv, clickIntent);
             return remoteViews;
         }
     
